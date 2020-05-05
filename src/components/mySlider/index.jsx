@@ -19,8 +19,8 @@ export default class MySlider extends PureComponent {
   refDragBlock = node => this.dragBlock = node
   refDragContainer = node => this.dragContainer = node
 
-  handleTouchStart = e => {
-    this.getDragInfo()
+  handleTouchStart = async e => {
+    await this.getDragInfo()
     this.spacingLeft = e.touches[0].pageX - this.blockX
   }
   handleTouchMove = e => {
@@ -38,7 +38,6 @@ export default class MySlider extends PureComponent {
     this.setState({
       dragLeft: left
     })
-    console.log(left, 'left')
   }
   handleTouchEnd = e => {
     console.log(e)
