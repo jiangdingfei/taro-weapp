@@ -1,4 +1,4 @@
-import Taro, { PureComponent } from '@tarojs/taro';
+import Taro, { PureComponent, hideToast } from '@tarojs/taro';
 import { View, Image } from '@tarojs/components';
 import minus01 from './static/minus01.png';
 import plus01 from './static/plus01.png';
@@ -24,6 +24,7 @@ export default class MySlider extends PureComponent {
     this.spacingLeft = e.touches[0].pageX - this.blockX
   }
   handleTouchMove = e => {
+    const { onChange } = this.props
     const pageX = e.touches[0].pageX
     let left
     const min = this.spacingLeft + this.contX
@@ -38,6 +39,7 @@ export default class MySlider extends PureComponent {
     this.setState({
       dragLeft: left
     })
+    onChange && onChange(left)
   }
   handleTouchEnd = e => {
     console.log(e)
@@ -66,11 +68,20 @@ export default class MySlider extends PureComponent {
       }
     })
   }
+  handleMinus = () => {
+
+  }
+  handlePlus = () => {
+
+  }
+  componentWillReceiveProps = nextProps => {
+
+  }
   render() {
     return (
       <View className='my-slider'>
         <View className='count-btn'>
-          <Image className='img' src={minus01}></Image>
+          <Image className='img' src={minus01} onClick={this.handleMinus}></Image>
         </View>
         <View className='content' ref={this.refDragContainer}>
           <View id='drag-container' className='line'></View>
@@ -87,7 +98,7 @@ export default class MySlider extends PureComponent {
           </View>
         </View>
         <View className='count-btn'>
-          <Image className='img' src={plus01}></Image>
+          <Image className='img' src={plus01} onClick={this.handlePlus}></Image>
         </View>
       </View>
     )
