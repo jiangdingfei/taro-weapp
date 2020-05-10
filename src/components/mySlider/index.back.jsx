@@ -1,97 +1,97 @@
 import Taro, { PureComponent, hideToast } from '@tarojs/taro';
 import { View, Image } from '@tarojs/components';
-import { getDomInfo } from '../../utils'
 import minus01 from './static/minus01.png';
 import plus01 from './static/plus01.png';
 import rateBtn from './static/rate_btn.png';
 import './index.scss'
 
 export default class MySlider extends PureComponent {
+  // dragBlock: Taro.RefObject<unknown>;
+  // dragContainer: Taro.RefObject<unknown>;
+  constructor(props) {
+    super(props)
+    // this.dragBlock = Taro.createRef();
+    // this.dragContainer = Taro.createRef()
+  }
   state = {
-    dragLeft: 0,
-    _value: this.props.value,
-    isTouch: false
+    dragLeft: 0
   }
   refDragBlock = node => this.dragBlock = node
   refDragContainer = node => this.dragContainer = node
 
   handleTouchStart = async e => {
-    const { isTouch } = this.state
-    // 是否是第一次触摸滑块
-    if (!isTouch) {
-      this.setState({
-        isTouch: true
-      })
-    }
     await this.getDragInfo()
     this.spacingLeft = e.touches[0].pageX - this.blockX
   }
   handleTouchMove = e => {
-    console.log(e, 'touchMove')
-    const { onChange, max, min } = this.props
+    const { onChange } = this.props
     const pageX = e.touches[0].pageX
     let left
-    const Min = this.spacingLeft + this.contX // 滑块移动的最小距离
-    const Max = this.contX + this.moveMaxLength + this.spacingLeft // 滑块移动的最大距离
-    if (pageX < Min) {
+    const min = this.spacingLeft + this.contX
+    const max = this.contX + this.moveMaxLength + this.spacingLeft
+    if (pageX < min) {
       left = 0
-    } else if (pageX > Max){
+    } else if (min<= pageX && pageX <= max) {
+      left = pageX - min
+    } else if (pageX > max){
       left = this.moveMaxLength
-    } else {
-      left = pageX - Min
     }
-    const _value = parseInt(left/(this.moveMaxLength/(max-min)))
     this.setState({
-      dragLeft: left,
-      _value: _value
+      dragLeft: left
     })
-    console.log(_value,'_value')
-    onChange && onChange(_value)
+    onChange && onChange(left)
   }
   handleTouchEnd = e => {
     console.log(e)
   }
   async getDragInfo() {
-    const rects = await getDomInfo(['#drag-block', '#drag-container'],this)
-    const { left: blockX, width: blockW } = rects[0] // 滑块的信息
-    const { left: contX, width: contW } = rects[1] // 父盒子的信息
+    const { left: blockX, width: blockW } = await this.getDomInfo(this.dragBlock)
+    const { left: contX, width: contW } = await this.getDomInfo(this.dragContainer)
     this.moveMaxLength = contW - blockW
     this.blockX = blockX
     this.blockW = blockW
     this.contX = contX
   }
-  handleMinus = async () => {
-    await this.getDragInfo()
+  getDomInfo(ref) {
+    return new Promise((resolve, reject) => {
+      if (process.env.TARO_ENV === 'weapp') {
+        try {
+          ref.boundingClientRect(rect => {
+            console.log(rect)
+            resolve(rect)
+          }).exec()
+        } catch (error) {
+          reject(error)
+        }
+      } else if (process.env.TARO_ENV === 'h5') {
+        resolve(ref.vnode.dom.getBoundingClientRect())
+      }
+    })
+  }
+  handleMinus = () => {
+
   }
   handlePlus = () => {
 
   }
   componentWillReceiveProps = nextProps => {
-    if (this.props.value = nextProps.value) return
-  }
-  async componentDidMount() {
-    console.log(222)
-    const { value, max, min } = this.props
-    await this.getDragInfo()
-    this.setState({
-      dragLeft: this.moveMaxLength/(max-min) * value
-    })
+
   }
   render() {
-    // const { value } = this.props
     return (
       <View className='my-slider'>
         <View className='count-btn'>
           <Image className='img' src={minus01} onClick={this.handleMinus}></Image>
         </View>
-        <View className='content' id='drag-container'>
-          <View className='line'></View>
+        <View className='content' ref={this.refDragContainer}>
+          <View id='drag-container' className='line'></View>
           <View
             id='drag-block'
             className='drag-block'
             onTouchStart={this.handleTouchStart}
             onTouchMove={this.handleTouchMove}
             onTouchEnd={this.handleTouchEnd}
+            ref={this.refDragBlock}
             style={`left: ${this.state.dragLeft}px`}
           >
             <Image className='img' src={rateBtn}></Image>
