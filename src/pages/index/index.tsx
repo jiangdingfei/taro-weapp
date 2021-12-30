@@ -105,6 +105,12 @@ class Index extends Component {
         <Button className='dec_btn' onClick={this.props.asyncAdd}>async</Button>
         <View><Text>{this.props.counter.num}</Text></View>
         <View><Text>Hello, World</Text></View>
+        <View onClick={() => {
+          Taro.navigateTo({
+            url: '/pages/webView/index'
+          })
+        }}
+        >跳转webview</View>
       </View>
     )
   }

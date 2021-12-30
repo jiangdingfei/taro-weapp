@@ -1,24 +1,42 @@
 import Taro, { PureComponent } from "@tarojs/taro";
-import { View } from "@tarojs/components";
-import MySlider from "../../components/mySlider";
-
+import { View, Button } from "@tarojs/components";
+// import Demo from './components/demo';
+// import MySlider from "../../components/mySlider";
+const salesApp = Taro.getApp();
 export default class Feature extends PureComponent {
   state = {
-    max: 70,
-    min: 0,
-    value: 25
+    value: 25,
   };
   onChange = (value) => {
     this.setState({
       value
     })
   }
+  componentDidMount() {
+    // console.log(navigator.userAgent, 'userAgent')
+    // alert(navigator.userAgent)
+
+  }
+  handleClick() {
+    const { value } = this.state
+    this.setState({
+      value: value + 1
+    })
+  }
+  handleBack() {
+    salesApp.value = this.state.value
+    Taro.navigateBack({
+      delta: 1
+    })
+  }
   render() {
-    const { max, min, value } = this.state;
+    const {  value } = this.state;
     return (
       <View>
         <View>滑块的值: {value}</View>
-        <MySlider max={max} min={min} value={value} onChange={this.onChange}></MySlider>
+        {/* <Demo count={value}></Demo> */}
+        <Button onClick={this.handleClick}>点我</Button>
+        <Button onClick={this.handleBack}>返回h5页面</Button>
       </View>
     );
   }

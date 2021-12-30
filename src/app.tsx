@@ -26,8 +26,10 @@ class App extends Component {
    */
   config: Config = {
     pages: [
+      'pages/index/index',
+      'pages/myWebView/index',
       'pages/feature/index',
-      'pages/index/index'
+      'pages/webView/index'
     ],
     window: {
       backgroundTextStyle: 'light',
